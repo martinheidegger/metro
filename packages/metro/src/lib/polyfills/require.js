@@ -406,18 +406,23 @@ function loadModuleImplementation(
     }
     moduleObject.id = moduleId;
 
-    // keep args in sync with with defineModuleCode in
-    // metro/src/Resolver/index.js
-    // and metro/src/ModuleGraph/worker.js
-    factory(
-      global,
-      metroRequire,
-      metroImportDefault,
-      metroImportAll,
-      moduleObject,
-      moduleObject.exports,
-      dependencyMap,
-    );
+    try {
+      // keep args in sync with with defineModuleCode in
+      // metro/src/Resolver/index.js
+      // and metro/src/ModuleGraph/worker.js
+      factory(
+        global,
+        metroRequire,
+        metroImportDefault,
+        metroImportAll,
+        moduleObject,
+        moduleObject.exports,
+        dependencyMap,
+      );
+    } catch (err) {
+      err.message += '\n when requiring: ' + module.verboseName;
+      throw err;
+    }
 
     // avoid removing factory in DEV mode as it breaks HMR
     if (!__DEV__) {
